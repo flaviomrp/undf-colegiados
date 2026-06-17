@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sistema de Colegiados da UnDF</title>
+  <style>
+    :root {
+      --bg: #f7f8fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --brand: #1f5f8b;
+      --brand-dark: #17496b;
+      --pill: #eef6fc;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header {
+      background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+      color: white;
+      padding: 28px 32px;
+    }
+    header h1 {
+      margin: 0 0 6px 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    header p {
+      margin: 0;
+      opacity: .92;
+      font-size: 14px;
+    }
+    main {
+      padding: 24px 32px 40px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+      padding: 18px;
+    }
+    .kpi-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--brand-dark);
+      margin-bottom: 4px;
+    }
+    .kpi-label {
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .filters {
+      display: grid;
+      grid-template-columns: 2fr repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+      align-items: end;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 11px 12px;
+      background: white;
+      color: var(--text);
+      font-size: 14px;
+    }
+    button {
+      border: none;
+      background: var(--brand);
+      color: white;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:hover { background: var(--brand-dark); }
+    .grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .section-title h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .section-title span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      padding: 10px 8px;
+      vertical-align: top;
+    }
+    th {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      background: #fafafa;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .table-wrap {
+      max-height: 560px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    .pill {
+      display: inline-block;
+      background: var(--pill);
+      color: var(--brand-dark);
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 12px;
+      margin: 2px 4px 2px 0;
+      white-space: nowrap;
+    }
+    .rank-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .rank-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid var(--line);
+      padding: 8px 0;
+      font-size: 13px;
+    }
+    .rank-name { font-weight: 600; }
+    .rank-count {
+      background: var(--pill);
+      color: var(--brand-dark);
+      border-radius: 8px;
+      min-width: 34px;
+      text-align: center;
+      padding: 4px 7px;
+      font-weight: 700;
+    }
+    .empty {
+      color: var(--muted);
+      padding: 18px;
+      text-align: center;
+    }
+    @media (max-width: 1000px) {
+      .kpis, .filters, .grid { grid-template-columns: 1fr; }
+      main { padding: 18px; }
+      header { padding: 24px 18px; }
+    }
+    @media print {
+      .filters button { display:none; }
+      .table-wrap { max-height: none; overflow: visible; }
+      body { background: white; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Sistema de Colegiados, Comissões, Comitês e Grupos de Trabalho da UnDF</h1>
+    <p>Consulta interativa gerada a partir da aba “X” da planilha de controle.</p>
+  </header>
+
+  <main>
+    <section class="kpis">
+      <div class="card"><div class="kpi-value" id="kpiColegiados">0</div><div class="kpi-label">Colegiados</div></div>
+      <div class="card"><div class="kpi-value" id="kpiMembros">0</div><div class="kpi-label">Membros/participantes</div></div>
+      <div class="card"><div class="kpi-value" id="kpiParticipacoes">0</div><div class="kpi-label">Participações</div></div>
+      <div class="card"><div class="kpi-value" id="kpiTematicas">0</div><div class="kpi-label">Temáticas</div></div>
+    </section>
+
+    <section class="card">
+      <div class="filters">
+        <div>
+          <label for="q">Pesquisa geral</label>
+          <input id="q" type="search" placeholder="Digite nome, colegiado, processo, publicação, função...">
+        </div>
+        <div>
+          <label for="membro">Membro</label>
+          <select id="membro"><option value="">Todos</option></select>
+        </div>
+        <div>
+          <label for="colegiado">Colegiado</label>
+          <select id="colegiado"><option value="">Todos</option></select>
+        </div>
+        <div>
+          <label for="tematica">Temática</label>
+          <select id="tematica"><option value="">Todas</option></select>
+        </div>
+        <div>
+          <label for="tipo">Tipo</label>
+          <select id="tipo"><option value="">Todos</option></select>
+        </div>
+      </div>
+      <button onclick="limparFiltros()">Limpar filtros</button>
+    </section>
+
+    <div style="height:20px"></div>
+
+    <section class="grid">
+      <div class="card">
+        <div class="section-title">
+          <h2>Participações encontradas</h2>
+          <span id="countRows">0 registros</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Membro</th>
+                <th>Colegiado</th>
+                <th>Função</th>
+                <th>Temática</th>
+                <th>Processo SEI</th>
+                <th>Publicação</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <aside class="card">
+        <div class="section-title">
+          <h2>Ranking de participação</h2>
+          <span>Top 15</span>
+        </div>
+        <div class="rank-list" id="ranking"></div>
+
+        <div style="height:22px"></div>
+
+        <div class="section-title">
+          <h2>Resumo por tipo</h2>
+          <span>Registros filtrados</span>
+        </div>
+        <div id="resumoTipo"></div>
+
+        <div style="height:22px"></div>
+
+        <div class="section-title">
+          <h2>Colegiados no filtro</h2>
+          <span id="countColegiadosFiltro">0</span>
+        </div>
+        <div id="chipsColegiados"></div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const dados = [{"ID": 1, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00000667/2025-45", "Publicação mais recente": "INSTRUÇÃO Nº 31, DE 21 DE MAIO DE 2025", "Colegiado": "Comissão Permanente de Avaliação - CPA", "Membro": "VIVIANE MARIA XAVIER DE SENA", "Função": "Membro titular"}, {"ID": 2, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00000667/2025-45", "Publicação mais recente": "INSTRUÇÃO Nº 31, DE 21 DE MAIO DE 2025", "Colegiado": "Comissão Permanente de Avaliação - CPA", "Membro": "ERIKA MARIANA BISPO NOGUEIRA", "Função": "Membro titular"}, {"ID": 3, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00000667/2025-45", "Publicação mais recente": "INSTRUÇÃO Nº 31, DE 21 DE MAIO DE 2025", "Colegiado": "Comissão Permanente de Avaliação - CPA", "Membro": "TERESA CHRISTINE PEREIRA MORAIS", "Função": "Membro titular"}, {"ID": 4, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00000667/2025-45", "Publicação mais recente": "INSTRUÇÃO Nº 31, DE 21 DE MAIO DE 2025", "Colegiado": "Comissão Permanente de Avaliação - CPA", "Membro": "WALACE ROZA ABREU", "Função": "Membro titular"}, {"ID": 5, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00000667/2025-45", "Publicação mais recente": "INSTRUÇÃO Nº 31, DE 21 DE MAIO DE 2025", "Colegiado": "Comissão Permanente de Avaliação - CPA", "Membro": "ALESSANDRA EDVER", "Função": "Membro titular"}, {"ID": 6, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00000667/2025-45", "Publicação mais recente": "INSTRUÇÃO Nº 31, DE 21 DE MAIO DE 2025", "Colegiado": "Comissão Permanente de Avaliação - CPA", "Membro": "JULIANO SPOSITO GALDINO", "Função": "Membro titular"}, {"ID": 7, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00002389/2024-80", "Publicação mais recente": "INSTRUÇÃO N° 02, DE 09 DE FEVEREIRO 2026", "Colegiado": "Comissão Especial Eleitoral", "Membro": "FABIANA CLAUDIA DE VASCONCELOS FRANÇA", "Função": "Membro titular"}, {"ID": 8, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00002389/2024-80", "Publicação mais recente": "INSTRUÇÃO N° 02, DE 09 DE FEVEREIRO 2026", "Colegiado": "Comissão Especial Eleitoral", "Membro": "ROBERTA MOREIRA MATEUS", "Função": "Membro titular"}, {"ID": 9, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00002389/2024-80", "Publicação mais recente": "INSTRUÇÃO N° 02, DE 09 DE FEVEREIRO 2026", "Colegiado": "Comissão Especial Eleitoral", "Membro": "GUILHERME BARONI MORALES", "Função": "Membro titular"}, {"ID": 10, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00002389/2024-80", "Publicação mais recente": "INSTRUÇÃO N° 02, DE 09 DE FEVEREIRO 2026", "Colegiado": "Comissão Especial Eleitoral", "Membro": "GIOVANI GRASSI", "Função": "Membro titular"}, {"ID": 11, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00002389/2024-80", "Publicação mais recente": "INSTRUÇÃO N° 02, DE 09 DE FEVEREIRO 2026", "Colegiado": "Comissão Especial Eleitoral", "Membro": "PEDRO LIMA GONÇALVES", "Função": "Membro titular"}, {"ID": 12, "Tipo": "Comitê", "Temática": "Governança", "Processo SEI": "04030-00000071/2022-01", "Publicação mais recente": "INSTRUÇÃO Nº 32, DE 07 DE JUNHO DE 2024", "Colegiado": "Comitê Interno de Governança e Integridade Pública - CGIP", "Membro": "FERNANDA MARSARO DOS SANTOS", "Função": "Membro titular"}, {"ID": 13, "Tipo": "Comitê", "Temática": "Governança", "Processo SEI": "04030-00000071/2022-01", "Publicação mais recente": "INSTRUÇÃO Nº 32, DE 07 DE JUNHO DE 2024", "Colegiado": "Comitê Interno de Governança e Integridade Pública - CGIP", "Membro": "KLÉVER CORRENTE DA SILVA", "Função": "Membro titular"}, {"ID": 14, "Tipo": "Comitê", "Temática": "Governança", "Processo SEI": "04030-00000071/2022-01", "Publicação mais recente": "INSTRUÇÃO Nº 32, DE 07 DE JUNHO DE 2024", "Colegiado": "Comitê Interno de Governança e Integridade Pública - CGIP", "Membro": "JOELMA BOMFIM", "Função": "Membro titular"}, {"ID": 15, "Tipo": "Comitê", "Temática": "Governança", "Processo SEI": "04030-00000071/2022-01", "Publicação mais recente": "INSTRUÇÃO Nº 32, DE 07 DE JUNHO DE 2024", "Colegiado": "Comitê Interno de Governança e Integridade Pública - CGIP", "Membro": "CÁSSIA BARRETTO", "Função": "Membro titular"}, {"ID": 16, "Tipo": "Comitê", "Temática": "Governança", "Processo SEI": "04030-00000071/2022-01", "Publicação mais recente": "INSTRUÇÃO Nº 32, DE 07 DE JUNHO DE 2024", "Colegiado": "Comitê Interno de Governança e Integridade Pública - CGIP", "Membro": "", "Função": "Membro titular"}, {"ID": 17, "Tipo": "Comitê", "Temática": "Governança", "Processo SEI": "04030-00000071/2022-01", "Publicação mais recente": "INSTRUÇÃO Nº 32, DE 07 DE JUNHO DE 2024", "Colegiado": "Comitê Interno de Governança e Integridade Pública - CGIP", "Membro": "EDNA MARTINS", "Função": "Membro titular"}, {"ID": 18, "Tipo": "Comitê", "Temática": "Governança", "Processo SEI": "04030-00000071/2022-01", "Publicação mais recente": "INSTRUÇÃO Nº 32, DE 07 DE JUNHO DE 2024", "Colegiado": "Comitê Interno de Governança e Integridade Pública - CGIP", "Membro": "EDUARDO GOLFETTO", "Função": "Membro titular"}, {"ID": 19, "Tipo": "Comitê", "Temática": "Governança", "Processo SEI": "04030-00000071/2022-01", "Publicação mais recente": "INSTRUÇÃO Nº 32, DE 07 DE JUNHO DE 2024", "Colegiado": "Comitê Interno de Governança e Integridade Pública - CGIP", "Membro": "ROBSON LUSTOZA", "Função": "Membro titular"}, {"ID": 20, "Tipo": "Comitê", "Temática": "Governança", "Processo SEI": "04030-00000071/2022-01", "Publicação mais recente": "INSTRUÇÃO Nº 32, DE 07 DE JUNHO DE 2024", "Colegiado": "Comitê Interno de Governança e Integridade Pública - CGIP", "Membro": "DANÚBIA", "Função": "Membro titular"}, {"ID": 21, "Tipo": "Comitê", "Temática": "Governança", "Processo SEI": "04030-00000071/2022-01", "Publicação mais recente": "INSTRUÇÃO Nº 32, DE 07 DE JUNHO DE 2024", "Colegiado": "Comitê Interno de Governança e Integridade Pública - CGIP", "Membro": "JORGE RENAN MARINHO", "Função": "Membro titular"}, {"ID": 22, "Tipo": "Comitê", "Temática": "Governança", "Processo SEI": "04030-00000071/2022-01", "Publicação mais recente": "INSTRUÇÃO Nº 32, DE 07 DE JUNHO DE 2024", "Colegiado": "Comitê Interno de Governança e Integridade Pública - CGIP", "Membro": "EDSON BESERRA", "Função": "Membro titular"}, {"ID": 23, "Tipo": "Comitê", "Temática": "Governança", "Processo SEI": "04030-00000071/2022-01", "Publicação mais recente": "INSTRUÇÃO Nº 32, DE 07 DE JUNHO DE 2024", "Colegiado": "Comitê Interno de Governança e Integridade Pública - CGIP", "Membro": "IGOR LEAL", "Função": "Membro titular"}, {"ID": 24, "Tipo": "Comitê", "Temática": "Governança", "Processo SEI": "04030-00000071/2022-01", "Publicação mais recente": "INSTRUÇÃO Nº 32, DE 07 DE JUNHO DE 2024", "Colegiado": "Comitê Interno de Governança e Integridade Pública - CGIP", "Membro": "GIOVANNIA SOUTINHO", "Função": "Membro titular"}, {"ID": 25, "Tipo": "Comitê", "Temática": "Governança", "Processo SEI": "04030-00000071/2022-01", "Publicação mais recente": "INSTRUÇÃO Nº 32, DE 07 DE JUNHO DE 2024", "Colegiado": "Comitê Interno de Governança e Integridade Pública - CGIP", "Membro": "DÉBORA MACHADO", "Função": "Membro titular"}, {"ID": 26, "Tipo": "Comitê", "Temática": "Governança", "Processo SEI": "04030-00000071/2022-01", "Publicação mais recente": "INSTRUÇÃO Nº 32, DE 07 DE JUNHO DE 2024", "Colegiado": "Comitê Interno de Governança e Integridade Pública - CGIP", "Membro": "PALOMA KARUZA", "Função": "Membro titular"}, {"ID": 27, "Tipo": "Comitê", "Temática": "Governança", "Processo SEI": "04030-00000071/2022-01", "Publicação mais recente": "INSTRUÇÃO Nº 32, DE 07 DE JUNHO DE 2024", "Colegiado": "Comitê Interno de Governança e Integridade Pública - CGIP", "Membro": "ANTÔNIO AUGUSTO", "Função": "Membro titular"}, {"ID": 28, "Tipo": "Comitê", "Temática": "Governança", "Processo SEI": "04030-00000071/2022-01", "Publicação mais recente": "INSTRUÇÃO Nº 32, DE 07 DE JUNHO DE 2024", "Colegiado": "Comitê Interno de Governança e Integridade Pública - CGIP", "Membro": "FABIANA CLAUDIA DE VASCONCELOS FRANÇA", "Função": "Membro titular"}, {"ID": 29, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00000612/2022-92", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 31, DE 26 DE SETEMBRO DE 2023", "Colegiado": "Comissão de Ética", "Membro": "SÉRGIO LUIZ ANTUNES NETTO CARREIRA", "Função": "Presidente"}, {"ID": 30, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00000612/2022-92", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 31, DE 26 DE SETEMBRO DE 2023", "Colegiado": "Comissão de Ética", "Membro": "CLÁUDIA ROSA MENDONÇA", "Função": "Membro suplente"}, {"ID": 31, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00000612/2022-92", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 31, DE 26 DE SETEMBRO DE 2023", "Colegiado": "Comissão de Ética", "Membro": "IVONETE ARAÚJO CARVALHO LIMA GRANJEIRO", "Função": "Membro titular"}, {"ID": 32, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00000612/2022-92", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 31, DE 26 DE SETEMBRO DE 2023", "Colegiado": "Comissão de Ética", "Membro": "GABRIEL BRISOLA DA CUNHA PRADO", "Função": "Membro suplente"}, {"ID": 33, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00000612/2022-92", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 31, DE 26 DE SETEMBRO DE 2023", "Colegiado": "Comissão de Ética", "Membro": "LUCIANA DE CASTRO ÁLVARES", "Função": "Membro Titular"}, {"ID": 34, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00000612/2022-92", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 31, DE 26 DE SETEMBRO DE 2023", "Colegiado": "Comissão de Ética", "Membro": "BRUNO GONTYJO DO COUTO", "Função": "Membro suplente"}, {"ID": 35, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00001273/2023-42", "Publicação mais recente": "INSTRUÇÃO Nº 08, DE 06 DE ABRIL DE 2026", "Colegiado": "Comissão Permanente de Correição – CPCor", "Membro": "ALINE CRISTINA MONTES", "Função": "Presidente"}, {"ID": 36, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00001273/2023-42", "Publicação mais recente": "INSTRUÇÃO Nº 08, DE 06 DE ABRIL DE 2026", "Colegiado": "Comissão Permanente de Correição – CPCor", "Membro": "FABIANA DE ANDRADE SOUZA BRAGA", "Função": "Vice-Presidente"}, {"ID": 37, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00001273/2023-42", "Publicação mais recente": "INSTRUÇÃO Nº 08, DE 06 DE ABRIL DE 2026", "Colegiado": "Comissão Permanente de Correição – CPCor", "Membro": "MARIA DALVINA MAGALHÃES DOURADO", "Função": "Membro titular"}, {"ID": 38, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00001273/2023-42", "Publicação mais recente": "INSTRUÇÃO Nº 08, DE 06 DE ABRIL DE 2026", "Colegiado": "Comissão Permanente de Correição – CPCor", "Membro": "EDELISE MARIA CARVALHO SILVA", "Função": "Membro titular"}, {"ID": 39, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00001273/2023-42", "Publicação mais recente": "INSTRUÇÃO Nº 08, DE 06 DE ABRIL DE 2026", "Colegiado": "Comissão Permanente de Correição – CPCor", "Membro": "LIDIANE SOUSA DE ALBUQUERQUE", "Função": "Membro titular"}, {"ID": 40, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00001273/2023-42", "Publicação mais recente": "INSTRUÇÃO Nº 08, DE 06 DE ABRIL DE 2026", "Colegiado": "Comissão Permanente de Correição – CPCor", "Membro": "FRANCISCO CARLOS SALES JUNIOR", "Função": "Membro titular"}, {"ID": 41, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00001273/2023-42", "Publicação mais recente": "INSTRUÇÃO Nº 08, DE 06 DE ABRIL DE 2026", "Colegiado": "Comissão Permanente de Correição – CPCor", "Membro": "BARBARA CRISTINA SOARES MARINHO", "Função": "Membro titular"}, {"ID": 42, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00001273/2023-42", "Publicação mais recente": "INSTRUÇÃO Nº 08, DE 06 DE ABRIL DE 2026", "Colegiado": "Comissão Permanente de Correição – CPCor", "Membro": "GUILHERME BARONI MORALES", "Função": "Membro titular"}, {"ID": 43, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00001273/2023-42", "Publicação mais recente": "INSTRUÇÃO Nº 08, DE 06 DE ABRIL DE 2026", "Colegiado": "Comissão Permanente de Correição – CPCor", "Membro": "VALÉRIA GOMES BORGES VIEIRA", "Função": "Membro titular"}, {"ID": 44, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00001273/2023-42", "Publicação mais recente": "INSTRUÇÃO Nº 08, DE 06 DE ABRIL DE 2026", "Colegiado": "Comissão Permanente de Correição – CPCor", "Membro": "RICHARD JAMES LOPES DE ABREU", "Função": "Membro titular"}, {"ID": 45, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00001273/2023-42", "Publicação mais recente": "INSTRUÇÃO Nº 08, DE 06 DE ABRIL DE 2026", "Colegiado": "Comissão Permanente de Correição – CPCor", "Membro": "MARIA DA CRUZ LOBO PORTELA", "Função": "Membro titular"}, {"ID": 46, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00000206/2023-19", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 14, DE 26 DE FEVEREIRO DE 2025", "Colegiado": "Comissão Permanente de Acumulação de Cargos Públicos - CPAC", "Membro": "RAPHAEL DOS REIS AUGUSTO", "Função": "Presidente"}, {"ID": 47, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00000206/2023-19", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 14, DE 26 DE FEVEREIRO DE 2025", "Colegiado": "Comissão Permanente de Acumulação de Cargos Públicos - CPAC", "Membro": "MARIA DA CRUZ LOBO PORTELA", "Função": "Membro titular"}, {"ID": 48, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00000206/2023-19", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 14, DE 26 DE FEVEREIRO DE 2025", "Colegiado": "Comissão Permanente de Acumulação de Cargos Públicos - CPAC", "Membro": "JULIANO SPOSITO GALDINO", "Função": "Membro titular"}, {"ID": 49, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00001481/2023-41", "Publicação mais recente": "PORTARIA Nº 07, DE 02 DE FEVEREIRO DE 2024", "Colegiado": "Comissão Eleitoral Provisória no âmbito dos órgãos colegiados - CEPU", "Membro": "GUILHERME BARONI MORALES", "Função": "Presidente"}, {"ID": 50, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00001481/2023-41", "Publicação mais recente": "PORTARIA Nº 07, DE 02 DE FEVEREIRO DE 2024", "Colegiado": "Comissão Eleitoral Provisória no âmbito dos órgãos colegiados - CEPU", "Membro": "GIOVANNI GRASSI", "Função": "Membro titular"}, {"ID": 51, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "04030-00001481/2023-41", "Publicação mais recente": "PORTARIA Nº 07, DE 02 DE FEVEREIRO DE 2024", "Colegiado": "Comissão Eleitoral Provisória no âmbito dos órgãos colegiados - CEPU", "Membro": "ROBERTA MOREIRA MATEUS", "Função": "Membro titular"}, {"ID": 52, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00000504/2023-09", "Publicação mais recente": "PORTARIA Nº 02, DE 11 DE JANEIRO DE 2024", "Colegiado": "Comissão Permanente de Processo Seletivo para o ingresso de estudantes", "Membro": "JOÃO FELIPE DE SOUZA", "Função": "Presidente"}, {"ID": 53, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00000504/2023-09", "Publicação mais recente": "PORTARIA Nº 02, DE 11 DE JANEIRO DE 2024", "Colegiado": "Comissão Permanente de Processo Seletivo para o ingresso de estudantes", "Membro": "TAMAHINE SANTOS SALES", "Função": "Membro titular"}, {"ID": 54, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00000504/2023-09", "Publicação mais recente": "PORTARIA Nº 02, DE 11 DE JANEIRO DE 2024", "Colegiado": "Comissão Permanente de Processo Seletivo para o ingresso de estudantes", "Membro": "ROSÂNGELA LOPES CRUZEIRO PEIXOTO", "Função": "Membro titular"}, {"ID": 55, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00000504/2023-09", "Publicação mais recente": "PORTARIA Nº 02, DE 11 DE JANEIRO DE 2024", "Colegiado": "Comissão Permanente de Processo Seletivo para o ingresso de estudantes", "Membro": "ANA CRISTINA DE ALMEIDA", "Função": "Membro titular"}, {"ID": 56, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00000504/2023-09", "Publicação mais recente": "PORTARIA Nº 02, DE 11 DE JANEIRO DE 2024", "Colegiado": "Comissão Permanente de Processo Seletivo para o ingresso de estudantes", "Membro": "PEDRO RODRIGUES DE ALENCAR", "Função": "Membro titular"}, {"ID": 57, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00000504/2023-09", "Publicação mais recente": "PORTARIA Nº 02, DE 11 DE JANEIRO DE 2024", "Colegiado": "Comissão Permanente de Processo Seletivo para o ingresso de estudantes", "Membro": "FRANCISCO CARLOS SALES JUNIOR", "Função": "Membro titular"}, {"ID": 58, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00000504/2023-09", "Publicação mais recente": "PORTARIA Nº 02, DE 11 DE JANEIRO DE 2024", "Colegiado": "Comissão Permanente de Processo Seletivo para o ingresso de estudantes", "Membro": "GUSTAVO CÉSAR DE ALMEIDA", "Função": "Membro titular"}, {"ID": 59, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00000504/2023-09", "Publicação mais recente": "PORTARIA Nº 02, DE 11 DE JANEIRO DE 2024", "Colegiado": "Comissão Permanente de Processo Seletivo para o ingresso de estudantes", "Membro": "ROBERTA MOREIRA MATEUS", "Função": "Membro titular"}, {"ID": 60, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "ROBSON MONTEGOMERI RIBEIRO LUSTOSA", "Função": "Coordenador"}, {"ID": 61, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "MAYSA DE FÁTIMA MOREIRA RODRIGUES", "Função": "Membro titular"}, {"ID": 62, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "CAROLINA RAMOS HENRIQUE", "Função": "Membro titular"}, {"ID": 63, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "GUILHERME PEREIRA RODRIGUES BORGES", "Função": "Membro titular"}, {"ID": 64, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "IGOR LEAL SOUZA", "Função": "Membro titular"}, {"ID": 65, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "FERNANDO LIMA MADEIRA", "Função": "Membro titular"}, {"ID": 66, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "RICARDO BARROS SAMPAIO", "Função": "Membro titular"}, {"ID": 67, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "EICK NICKSON FREIRE SILVA", "Função": "Membro titular"}, {"ID": 68, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "LARISSA ARAUJO MATOS", "Função": "Membro titular"}, {"ID": 69, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "SULA SALANI MOTA", "Função": "Membro titular"}, {"ID": 70, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "EDSON ALVES DE LIMA", "Função": "Membro titular"}, {"ID": 71, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "LURIAN JOSE REIS DA SILVA LIMA", "Função": "Membro titular"}, {"ID": 72, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "JORGE RENAN MENDES MARINHO", "Função": "Membro titular"}, {"ID": 73, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "RAFAEL SOUSA LIMA", "Função": "Membro titular"}, {"ID": 74, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "BRUNO FERREIRA CORDEIRO", "Função": "Membro titular"}, {"ID": 75, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "GIOVANNA SOUTINHO ARAÚJO", "Função": "Membro titular"}, {"ID": 76, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "ADRIANA BARBOSA SOCRATES", "Função": "Membro titular"}, {"ID": 77, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "TERESA CHRISTINE PEREIRA MORAIS", "Função": "Membro titular"}, {"ID": 78, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001061/2025-27", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 46, DE 16 DE JUNHO DE 2025", "Colegiado": "Grupo de trabalho dos NDEs", "Membro": "MÁRCIA CARDOSO RODRIGUES", "Função": "Membro titular"}, {"ID": 79, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001284/2026-75", "Publicação mais recente": "Instrução Nº 21, de 08 de junho de 2026", "Colegiado": "Comissão de Heteroidentificação", "Membro": "Juliano Sposito Galdino", "Função": "Presidente"}, {"ID": 80, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001284/2026-75", "Publicação mais recente": "Instrução Nº 21, de 08 de junho de 2026", "Colegiado": "Comissão de Heteroidentificação", "Membro": "Danúbia da Costa Teixeira", "Função": "Secretária"}, {"ID": 81, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001284/2026-75", "Publicação mais recente": "Instrução Nº 21, de 08 de junho de 2026", "Colegiado": "Comissão de Heteroidentificação", "Membro": "Catarina Saman Diógenes Cesarino", "Função": "Membro titular"}, {"ID": 82, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001284/2026-75", "Publicação mais recente": "Instrução Nº 21, de 08 de junho de 2026", "Colegiado": "Comissão de Heteroidentificação", "Membro": "Leonardo Pereira da Costa", "Função": "Membro titular"}, {"ID": 83, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001284/2026-75", "Publicação mais recente": "Instrução Nº 21, de 08 de junho de 2026", "Colegiado": "Comissão de Heteroidentificação", "Membro": "Carolina Ramos Henrique", "Função": "Membro titular"}, {"ID": 84, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001284/2026-75", "Publicação mais recente": "Instrução Nº 21, de 08 de junho de 2026", "Colegiado": "Comissão de Heteroidentificação", "Membro": "Viviane Maria Xavier de Sena", "Função": "Membro titular"}, {"ID": 85, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001284/2026-75", "Publicação mais recente": "Instrução Nº 21, de 08 de junho de 2026", "Colegiado": "Comissão de Heteroidentificação", "Membro": "Gustavo José Oliveira de Souza", "Função": "Membro titular"}, {"ID": 86, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001284/2026-75", "Publicação mais recente": "Instrução Nº 21, de 08 de junho de 2026", "Colegiado": "Comissão de Heteroidentificação", "Membro": "Paloma Karuza Maroni da Silva", "Função": "Membro titular"}, {"ID": 87, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001284/2026-75", "Publicação mais recente": "Instrução Nº 21, de 08 de junho de 2026", "Colegiado": "Comissão de Heteroidentificação", "Membro": "Givael Lima da Silva", "Função": "Membro titular"}, {"ID": 88, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001284/2026-75", "Publicação mais recente": "Instrução Nº 21, de 08 de junho de 2026", "Colegiado": "Comissão de Heteroidentificação", "Membro": "Mayara Araújo Guimarães", "Função": "Membro titular"}, {"ID": 89, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001284/2026-75", "Publicação mais recente": "Instrução Nº 21, de 08 de junho de 2026", "Colegiado": "Comissão de Heteroidentificação", "Membro": "Larissa Araújo Matos", "Função": "Membro suplente"}, {"ID": 90, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001284/2026-75", "Publicação mais recente": "Instrução Nº 21, de 08 de junho de 2026", "Colegiado": "Comissão de Heteroidentificação", "Membro": "Luciana Nunes Fonseca", "Função": "Membro suplente"}, {"ID": 91, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001284/2026-75", "Publicação mais recente": "Instrução Nº 21, de 08 de junho de 2026", "Colegiado": "Comissão de Heteroidentificação", "Membro": "Thais Cristina de Melo Salvador", "Função": "Membro suplente"}, {"ID": 92, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001284/2026-75", "Publicação mais recente": "Instrução Nº 21, de 08 de junho de 2026", "Colegiado": "Comissão de Heteroidentificação", "Membro": "Ricardo Batista Machado", "Função": "Membro suplente"}, {"ID": 93, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001284/2026-75", "Publicação mais recente": "Instrução Nº 21, de 08 de junho de 2026", "Colegiado": "Comissão Recursal de Heteroidentificação Étnico-racial", "Membro": "Pedro Rodrigues de Alencar", "Função": "Presidente"}, {"ID": 94, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001284/2026-75", "Publicação mais recente": "Instrução Nº 21, de 08 de junho de 2026", "Colegiado": "Comissão Recursal de Heteroidentificação Étnico-racial", "Membro": "Frank Nely Peres Alves", "Função": "Secretário"}, {"ID": 95, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001284/2026-75", "Publicação mais recente": "Instrução Nº 21, de 08 de junho de 2026", "Colegiado": "Comissão Recursal de Heteroidentificação Étnico-racial", "Membro": "DAYSE RAYANE E SILVA MUNIZ", "Função": "Membro titular"}, {"ID": 96, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00000430/2023-01", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 39, DE 27 DE AGOSTO DE 2024", "Colegiado": "Comissão de Avaliação Socioeconômica (Seleção Unificada para Auxílios Estudantis)", "Membro": "JULIANO SPOSITO GALDINO", "Função": "Membro titular"}, {"ID": 97, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00000430/2023-01", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 39, DE 27 DE AGOSTO DE 2024", "Colegiado": "Comissão de Avaliação Socioeconômica (Seleção Unificada para Auxílios Estudantis)", "Membro": "ALINE CRISTINA MONTES", "Função": "Membro titular"}, {"ID": 98, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00000430/2023-01", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 39, DE 27 DE AGOSTO DE 2024", "Colegiado": "Comissão de Avaliação Socioeconômica (Seleção Unificada para Auxílios Estudantis)", "Membro": "JOÃO FELIPE DE SOUZA", "Função": "Membro titular"}, {"ID": 99, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00000430/2023-01", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 39, DE 27 DE AGOSTO DE 2024", "Colegiado": "Comissão de Avaliação Socioeconômica (Seleção Unificada para Auxílios Estudantis)", "Membro": "GIOVANNI GRASSI", "Função": "Membro titular"}, {"ID": 100, "Tipo": "Comissão", "Temática": "Compliance", "Processo SEI": "04030-00000430/2023-01", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 39, DE 27 DE AGOSTO DE 2024", "Colegiado": "Comissão de Avaliação Socioeconômica (Seleção Unificada para Auxílios Estudantis)", "Membro": "FELIPE SALOMÃO CARDOSO", "Função": "Membro titular"}, {"ID": 101, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "00064-00000457/2023-92", "Publicação mais recente": "Instrução Nº 03, de 04 de fevereiro de 2025", "Colegiado": "Comissão de Acompanhamento do processo de integração da ESCS", "Membro": "FABIANA CLAUDIA DE VASCONCELOS FRANÇA", "Função": "Presidente"}, {"ID": 102, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "00064-00000457/2023-92", "Publicação mais recente": "Instrução Nº 03, de 04 de fevereiro de 2025", "Colegiado": "Comissão de Acompanhamento do processo de integração da ESCS", "Membro": "ÂNGELA FERREIRA BARROS", "Função": "Membro suplente"}, {"ID": 103, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "00064-00000457/2023-92", "Publicação mais recente": "Instrução Nº 03, de 04 de fevereiro de 2025", "Colegiado": "Comissão de Acompanhamento do processo de integração da ESCS", "Membro": "THIAGO BLANCO VIEIRA", "Função": "Membro titular"}, {"ID": 104, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "00064-00000457/2023-92", "Publicação mais recente": "Instrução Nº 03, de 04 de fevereiro de 2025", "Colegiado": "Comissão de Acompanhamento do processo de integração da ESCS", "Membro": "ALINE DE OLIVEIRA COSTA", "Função": "Membro suplente"}, {"ID": 105, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "00064-00000457/2023-92", "Publicação mais recente": "Instrução Nº 03, de 04 de fevereiro de 2025", "Colegiado": "Comissão de Acompanhamento do processo de integração da ESCS", "Membro": "SÉRGIO EDUARDO SOARES FERNANDES", "Função": "Membro titular"}, {"ID": 106, "Tipo": "Comissão", "Temática": "Governança", "Processo SEI": "00064-00000457/2023-92", "Publicação mais recente": "Instrução Nº 03, de 04 de fevereiro de 2025", "Colegiado": "Comissão de Acompanhamento do processo de integração da ESCS", "Membro": "FERNANDA RAMOS MONTEIRO", "Função": "Membro suplente"}, {"ID": 107, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001779/2023-51", "Publicação mais recente": "INSTRUÇÃO N° 45 DE 15 DE OUTUBRO DE 2024", "Colegiado": "Comissão Docente de Avaliação Técnico-Científica", "Membro": "GABRIEL BRISOLA DA CUNHA", "Função": "Presidente"}, {"ID": 108, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001779/2023-51", "Publicação mais recente": "INSTRUÇÃO N° 45 DE 15 DE OUTUBRO DE 2024", "Colegiado": "Comissão Docente de Avaliação Técnico-Científica", "Membro": "CLAUDIA VICARI BOLOGNAMI", "Função": "Membro titular"}, {"ID": 109, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001779/2023-51", "Publicação mais recente": "INSTRUÇÃO N° 45 DE 15 DE OUTUBRO DE 2024", "Colegiado": "Comissão Docente de Avaliação Técnico-Científica", "Membro": "DAYSE RAYANE E SILVA MUNIZ", "Função": "Membro titular"}, {"ID": 110, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001779/2023-51", "Publicação mais recente": "INSTRUÇÃO N° 45 DE 15 DE OUTUBRO DE 2024", "Colegiado": "Comissão Docente de Avaliação Técnico-Científica", "Membro": "GIOVANNA SOUTINHO ARAÚJO", "Função": "Membro titular"}, {"ID": 111, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001779/2023-51", "Publicação mais recente": "INSTRUÇÃO N° 45 DE 15 DE OUTUBRO DE 2024", "Colegiado": "Comissão Docente de Avaliação Técnico-Científica", "Membro": "GUSTAVO GARCIA DE MELO", "Função": "Membro titular"}, {"ID": 112, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001779/2023-51", "Publicação mais recente": "INSTRUÇÃO N° 45 DE 15 DE OUTUBRO DE 2024", "Colegiado": "Comissão Docente de Avaliação Técnico-Científica", "Membro": "PALOMA KARUZA MARONI DA SILVA", "Função": "Membro titular"}, {"ID": 113, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001779/2023-51", "Publicação mais recente": "INSTRUÇÃO N° 45 DE 15 DE OUTUBRO DE 2024", "Colegiado": "Comissão Docente de Avaliação Técnico-Científica", "Membro": "RICARDO BRASIL CHOUERI", "Função": "Membro titular"}, {"ID": 114, "Tipo": "Comissão", "Temática": "Acadêmico", "Processo SEI": "04030-00001779/2023-51", "Publicação mais recente": "INSTRUÇÃO N° 45 DE 15 DE OUTUBRO DE 2024", "Colegiado": "Comissão Docente de Avaliação Técnico-Científica", "Membro": "VINICIUS SOARES SILVA MARQUES", "Função": "Membro titular"}, {"ID": 115, "Tipo": "Comissão", "Temática": "Administrativo", "Processo SEI": "04030-00001562/2023-41", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 20, DE 28 DE JUNHO DE 2024", "Colegiado": "Comissão de Gestão de Patrimônio Imobiliário (CGPI)", "Membro": "Oslanjedou de Santana Oliveira", "Função": "Membro titular"}, {"ID": 116, "Tipo": "Comissão", "Temática": "Administrativo", "Processo SEI": "04030-00001562/2023-41", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 20, DE 28 DE JUNHO DE 2024", "Colegiado": "Comissão de Gestão de Patrimônio Imobiliário (CGPI)", "Membro": "Fausto Pfahl", "Função": "Membro titular"}, {"ID": 117, "Tipo": "Comissão", "Temática": "Administrativo", "Processo SEI": "04030-00001562/2023-41", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 20, DE 28 DE JUNHO DE 2024", "Colegiado": "Comissão de Gestão de Patrimônio Imobiliário (CGPI)", "Membro": "Ricardo Augusto Ramos", "Função": "Membro titular"}, {"ID": 118, "Tipo": "Comissão", "Temática": "Administrativo", "Processo SEI": "04030-00000097/2022-41", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 20, DE 29 DE ABRIL DE 2024", "Colegiado": "Comissão Setorial de Avaliação de Documentos – CSAD", "Membro": "RACHEL CORADO", "Função": "Presidente"}, {"ID": 119, "Tipo": "Comissão", "Temática": "Administrativo", "Processo SEI": "04030-00000097/2022-41", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 20, DE 29 DE ABRIL DE 2024", "Colegiado": "Comissão Setorial de Avaliação de Documentos – CSAD", "Membro": "LUCIANA JACOBINA", "Função": "Membro titular"}, {"ID": 120, "Tipo": "Comissão", "Temática": "Administrativo", "Processo SEI": "04030-00000097/2022-41", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 20, DE 29 DE ABRIL DE 2024", "Colegiado": "Comissão Setorial de Avaliação de Documentos – CSAD", "Membro": "LUIZA MARTINS ARAÚJO", "Função": "Membro titular"}, {"ID": 121, "Tipo": "Comissão", "Temática": "Administrativo", "Processo SEI": "04030-00000097/2022-41", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 20, DE 29 DE ABRIL DE 2024", "Colegiado": "Comissão Setorial de Avaliação de Documentos – CSAD", "Membro": "FRANCISCO SALES JÚNIOR", "Função": "Membro titular"}, {"ID": 122, "Tipo": "Comissão", "Temática": "Administrativo", "Processo SEI": "04030-00000097/2022-41", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 20, DE 29 DE ABRIL DE 2024", "Colegiado": "Comissão Setorial de Avaliação de Documentos – CSAD", "Membro": "LUIZ FERNANDO SANTOS", "Função": "Membro titular"}, {"ID": 123, "Tipo": "Comissão", "Temática": "Gestão de Pessoas", "Processo SEI": "00150-00000622/2019-23", "Publicação mais recente": "INSTRUÇÃO Nº 22, DE 17 DE ABRIL DE 2024", "Colegiado": "Comissão de Avaliação de Desempenho e Promoção Funcional dos Servidores", "Membro": "LARISSA CÍNTHIA DA SILVA BARRETO LIMA", "Função": "Membro titular"}, {"ID": 124, "Tipo": "Comissão", "Temática": "Gestão de Pessoas", "Processo SEI": "00150-00000622/2019-23", "Publicação mais recente": "INSTRUÇÃO Nº 22, DE 17 DE ABRIL DE 2024", "Colegiado": "Comissão de Avaliação de Desempenho e Promoção Funcional dos Servidores", "Membro": "SUZANA MAHMUD SAID ARAR", "Função": "Membro titular"}, {"ID": 125, "Tipo": "Comissão", "Temática": "Gestão de Pessoas", "Processo SEI": "00150-00000622/2019-23", "Publicação mais recente": "INSTRUÇÃO Nº 22, DE 17 DE ABRIL DE 2024", "Colegiado": "Comissão de Avaliação de Desempenho e Promoção Funcional dos Servidores", "Membro": "MARIANE APARECIDA GONÇALVES DE ANDRADE", "Função": "Membro titular"}, {"ID": 126, "Tipo": "Comissão", "Temática": "Gestão de Pessoas", "Processo SEI": "04030-00000281/2022-9", "Publicação mais recente": "Instrução Nº 29, de 12 de maio de 2025", "Colegiado": "Comissão Especial de qualidade de vida no trabalho (PQVT)", "Membro": "LARISSA CÍNTHIA DA SILVA BARRETO LIMA", "Função": "Membro titular"}, {"ID": 127, "Tipo": "Comissão", "Temática": "Gestão de Pessoas", "Processo SEI": "04030-00000281/2022-9", "Publicação mais recente": "Instrução Nº 29, de 12 de maio de 2025", "Colegiado": "Comissão Especial de qualidade de vida no trabalho (PQVT)", "Membro": "ADRIANA BARBOSA SÓCRATES", "Função": "Membro titular"}, {"ID": 128, "Tipo": "Comissão", "Temática": "Gestão de Pessoas", "Processo SEI": "04030-00000281/2022-9", "Publicação mais recente": "Instrução Nº 29, de 12 de maio de 2025", "Colegiado": "Comissão Especial de qualidade de vida no trabalho (PQVT)", "Membro": "EMANUELLE SANTOS CAMELO", "Função": "Membro titular"}, {"ID": 129, "Tipo": "Comissão", "Temática": "Gestão de Pessoas", "Processo SEI": "04030-00000281/2022-9", "Publicação mais recente": "Instrução Nº 29, de 12 de maio de 2025", "Colegiado": "Comissão Especial de qualidade de vida no trabalho (PQVT)", "Membro": "EDELISE MARIA CARVALHO SILVA", "Função": "Membro suplente"}, {"ID": 130, "Tipo": "Comissão", "Temática": "Gestão de Pessoas", "Processo SEI": "04030-00000281/2022-9", "Publicação mais recente": "Instrução Nº 29, de 12 de maio de 2025", "Colegiado": "Comissão Especial de qualidade de vida no trabalho (PQVT)", "Membro": "HEBERTON DOS SANTOS PEREIRA", "Função": "Membro suplente"}, {"ID": 131, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00000731/2025-98", "Publicação mais recente": "Instrução Nº 26, de 16 de abril de 2025.", "Colegiado": "Grupo de Trabalho para elaboração de Política de Formação Docente", "Membro": "GIOVANNI GRASSI", "Função": "Presidente"}, {"ID": 132, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00000731/2025-98", "Publicação mais recente": "Instrução Nº 26, de 16 de abril de 2025.", "Colegiado": "Grupo de Trabalho para elaboração de Política de Formação Docente", "Membro": "ANGELA FERREIRA BARROS", "Função": "Membro titular"}, {"ID": 133, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00000731/2025-98", "Publicação mais recente": "Instrução Nº 26, de 16 de abril de 2025.", "Colegiado": "Grupo de Trabalho para elaboração de Política de Formação Docente", "Membro": "GIOVANNA SOUTINHO ARAUJO", "Função": "Membro titular"}, {"ID": 134, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00000731/2025-98", "Publicação mais recente": "Instrução Nº 26, de 16 de abril de 2025.", "Colegiado": "Grupo de Trabalho para elaboração de Política de Formação Docente", "Membro": "SULA SALANI MOTA", "Função": "Membro titular"}, {"ID": 135, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00000731/2025-98", "Publicação mais recente": "Instrução Nº 26, de 16 de abril de 2025.", "Colegiado": "Grupo de Trabalho para elaboração de Política de Formação Docente", "Membro": "OTAVIO SOUZA E ROCHA DIAS MACIEL", "Função": "Membro titular"}, {"ID": 136, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00000731/2025-98", "Publicação mais recente": "Instrução Nº 26, de 16 de abril de 2025.", "Colegiado": "Grupo de Trabalho para elaboração de Política de Formação Docente", "Membro": "ANUBIA DA COSTA TEIXEIRA", "Função": "Membro titular"}, {"ID": 137, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00000731/2025-98", "Publicação mais recente": "Instrução Nº 26, de 16 de abril de 2025.", "Colegiado": "Grupo de Trabalho para elaboração de Política de Formação Docente", "Membro": "ROBSON MONTEGOMERI RIBEIRO LUSTOSA", "Função": "Membro titular"}, {"ID": 138, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00000731/2025-98", "Publicação mais recente": "Instrução Nº 26, de 16 de abril de 2025.", "Colegiado": "Grupo de Trabalho para elaboração de Política de Formação Docente", "Membro": "GOR LEAL SOUZA", "Função": "Membro titular"}, {"ID": 139, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00000731/2025-98", "Publicação mais recente": "Instrução Nº 26, de 16 de abril de 2025.", "Colegiado": "Grupo de Trabalho para elaboração de Política de Formação Docente", "Membro": "FERNANDO LIMA MADEIRA", "Função": "Membro titular"}, {"ID": 140, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00000731/2025-98", "Publicação mais recente": "Instrução Nº 26, de 16 de abril de 2025.", "Colegiado": "Grupo de Trabalho para elaboração de Política de Formação Docente", "Membro": "GUILHERME BRUNO DE LIMA", "Função": "Membro titular"}, {"ID": 141, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00000731/2025-98", "Publicação mais recente": "Instrução Nº 26, de 16 de abril de 2025.", "Colegiado": "Grupo de Trabalho para elaboração de Política de Formação Docente", "Membro": "ADAM SMITH GONTIJO BRITO DE ASSIS", "Função": "Membro titular"}, {"ID": 142, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00000731/2025-98", "Publicação mais recente": "Instrução Nº 26, de 16 de abril de 2025.", "Colegiado": "Grupo de Trabalho para elaboração de Política de Formação Docente", "Membro": "ANE CRISTINA ULIANA PERTELE", "Função": "Membro titular"}, {"ID": 143, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00000731/2025-98", "Publicação mais recente": "Instrução Nº 26, de 16 de abril de 2025.", "Colegiado": "Grupo de Trabalho para elaboração de Política de Formação Docente", "Membro": "FLÁVIA KANITZ", "Função": "Membro titular"}, {"ID": 144, "Tipo": "Comitê", "Temática": "Tecnologia da Informação", "Processo SEI": "04030-00000149/2022-89", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 52, DE 04 DE NOVEMBRO DE 2024", "Colegiado": "Comitê Gestor de Tecnologia e Comunicação - CGTI", "Membro": "THIAGO OLIVEIRA TEIXEIRA", "Função": "Presidente"}, {"ID": 145, "Tipo": "Comitê", "Temática": "Tecnologia da Informação", "Processo SEI": "04030-00000149/2022-89", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 52, DE 04 DE NOVEMBRO DE 2024", "Colegiado": "Comitê Gestor de Tecnologia e Comunicação - CGTI", "Membro": "GUSTAVO CESAR DE ALMEIDA", "Função": "Membro titular"}, {"ID": 146, "Tipo": "Comitê", "Temática": "Tecnologia da Informação", "Processo SEI": "04030-00000149/2022-89", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 52, DE 04 DE NOVEMBRO DE 2024", "Colegiado": "Comitê Gestor de Tecnologia e Comunicação - CGTI", "Membro": "FELIPE SALOMÃO CARDOSO", "Função": "Membro titular"}, {"ID": 147, "Tipo": "Comitê", "Temática": "Tecnologia da Informação", "Processo SEI": "04030-00000149/2022-89", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 52, DE 04 DE NOVEMBRO DE 2024", "Colegiado": "Comitê Gestor de Tecnologia e Comunicação - CGTI", "Membro": "FERNANDA AUGUSTA SANTOS ESCOSSIA DE OLIVEIRA", "Função": "Membro titular"}, {"ID": 148, "Tipo": "Comitê", "Temática": "Tecnologia da Informação", "Processo SEI": "04030-00000149/2022-89", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 52, DE 04 DE NOVEMBRO DE 2024", "Colegiado": "Comitê Gestor de Tecnologia e Comunicação - CGTI", "Membro": "EDUARDO CABRAL GOLFETTO", "Função": "Membro titular"}, {"ID": 149, "Tipo": "Comitê", "Temática": "Tecnologia da Informação", "Processo SEI": "04030-00000149/2022-89", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 52, DE 04 DE NOVEMBRO DE 2024", "Colegiado": "Comitê Gestor de Tecnologia e Comunicação - CGTI", "Membro": "TATIANA SANTOS DE LIMA", "Função": "Membro titular"}, {"ID": 150, "Tipo": "Comitê", "Temática": "Tecnologia da Informação", "Processo SEI": "04030-00000149/2022-89", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 52, DE 04 DE NOVEMBRO DE 2024", "Colegiado": "Comitê Gestor de Tecnologia e Comunicação - CGTI", "Membro": "JULIANO SPOSITO GALDINO", "Função": "Membro titular"}, {"ID": 151, "Tipo": "Comitê", "Temática": "Tecnologia da Informação", "Processo SEI": "04030-00000149/2022-89", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 52, DE 04 DE NOVEMBRO DE 2024", "Colegiado": "Comitê Gestor de Tecnologia e Comunicação - CGTI", "Membro": "EDI SILVA PIRES", "Função": "Membro titular"}, {"ID": 152, "Tipo": "Comitê", "Temática": "Tecnologia da Informação", "Processo SEI": "04030-00000149/2022-89", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 52, DE 04 DE NOVEMBRO DE 2024", "Colegiado": "Comitê Gestor de Tecnologia e Comunicação - CGTI", "Membro": "ZANANDREA MEDEIROS NASCIMENTO", "Função": "Membro titular"}, {"ID": 153, "Tipo": "Comitê", "Temática": "Tecnologia da Informação", "Processo SEI": "04030-00000429/2025-30", "Publicação mais recente": "INSTRUÇÃO Nº 19, DE 28 DE MARÇO DE 2025", "Colegiado": "Subcomitê Gestor de Transformação Digital (SCTD)", "Membro": "ALAN SILVA MACEDO", "Função": "Membro titular"}, {"ID": 154, "Tipo": "Comitê", "Temática": "Tecnologia da Informação", "Processo SEI": "04030-00000429/2025-30", "Publicação mais recente": "INSTRUÇÃO Nº 19, DE 28 DE MARÇO DE 2025", "Colegiado": "Subcomitê Gestor de Transformação Digital (SCTD)", "Membro": "JULIANO SPOSITO GALDINO", "Função": "Membro titular"}, {"ID": 155, "Tipo": "Comitê", "Temática": "Administrativo", "Processo SEI": "04030-00000429/2025-30", "Publicação mais recente": "INSTRUÇÃO Nº 19, DE 28 DE MARÇO DE 2025", "Colegiado": "Subcomitê Gestor de Transformação Digital (SCTD)", "Membro": "IGOR LEAL SOUZA", "Função": "Membro titular"}, {"ID": 156, "Tipo": "Comissão", "Temática": "Administrativo", "Processo SEI": "04030-00000065/2022-45", "Publicação mais recente": "Instrução Nº 10, de 25 de fevereiro de 2025", "Colegiado": "Comissão do SEI", "Membro": "JULIANO SPOSITO GALDINO", "Função": "Membro titular"}, {"ID": 157, "Tipo": "Comissão", "Temática": "Administrativo", "Processo SEI": "04030-00000065/2022-45", "Publicação mais recente": "Instrução Nº 10, de 25 de fevereiro de 2025", "Colegiado": "Comissão do SEI", "Membro": "LARISSA CINTHIA DA SILVA BARRETO LIMA", "Função": "Membro titular"}, {"ID": 158, "Tipo": "Comissão", "Temática": "Administrativo", "Processo SEI": "04030-00000065/2022-45", "Publicação mais recente": "Instrução Nº 10, de 25 de fevereiro de 2025", "Colegiado": "Comissão do SEI", "Membro": "RICARDO BRITO DOS SANTOS", "Função": "Membro titular"}, {"ID": 159, "Tipo": "Comissão", "Temática": "Administrativo", "Processo SEI": "04030-00000065/2022-45", "Publicação mais recente": "Instrução Nº 10, de 25 de fevereiro de 2025", "Colegiado": "Comissão do SEI", "Membro": "GUSTAVO CÉSAR DE ALMEIDA", "Função": "Membro titular"}, {"ID": 160, "Tipo": "Comissão", "Temática": "Tecnologia da Informação", "Processo SEI": "04030-00000623/2023-53", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 03, DE 04 DE MARÇO DE 2024", "Colegiado": "Comissão de Implantação do SolisGE", "Membro": "FRANCISCO CARLOS SALES JÚNIOR", "Função": "Presidente"}, {"ID": 161, "Tipo": "Comissão", "Temática": "Tecnologia da Informação", "Processo SEI": "04030-00000623/2023-53", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 03, DE 04 DE MARÇO DE 2024", "Colegiado": "Comissão de Implantação do SolisGE", "Membro": "FLAVIO MASCARENHAS RORIZ PEDROSA", "Função": "Membro titular"}, {"ID": 162, "Tipo": "Comissão", "Temática": "Tecnologia da Informação", "Processo SEI": "04030-00000623/2023-53", "Publicação mais recente": "ORDEM DE SERVIÇO Nº 03, DE 04 DE MARÇO DE 2024", "Colegiado": "Comissão de Implantação do SolisGE", "Membro": "CLAUDIA ROSA MENDONÇA", "Função": "Membro titular"}, {"ID": 163, "Tipo": "Comissão", "Temática": "Parcerias institucionais", "Processo SEI": "04030-00001515/2023-06", "Publicação mais recente": "INSTRUÇÃO Nº 15, DE 03 DE ABRIL DE 2024", "Colegiado": "Comissão de Monitoramento e Avaliação das parcerias com OSCIPs - CMAP", "Membro": "EDELISE MARIA CARVALHO SILVA", "Função": "Membro titular"}, {"ID": 164, "Tipo": "Comissão", "Temática": "Parcerias institucionais", "Processo SEI": "04030-00001515/2023-06", "Publicação mais recente": "INSTRUÇÃO Nº 15, DE 03 DE ABRIL DE 2024", "Colegiado": "Comissão de Monitoramento e Avaliação das parcerias com OSCIPs - CMAP", "Membro": "PEDRO RODRIGUES DE ALENCAR", "Função": "Membro titular"}, {"ID": 165, "Tipo": "Comissão", "Temática": "Parcerias institucionais", "Processo SEI": "04030-00001515/2023-06", "Publicação mais recente": "INSTRUÇÃO Nº 15, DE 03 DE ABRIL DE 2024", "Colegiado": "Comissão de Monitoramento e Avaliação das parcerias com OSCIPs - CMAP", "Membro": "LIDIANE SOUSA DE ALBUQUERQUE", "Função": "Membro titular"}, {"ID": 166, "Tipo": "Comissão", "Temática": "Parcerias institucionais", "Processo SEI": "04030-00001515/2023-06", "Publicação mais recente": "INSTRUÇÃO Nº 15, DE 03 DE ABRIL DE 2024", "Colegiado": "Comissão de Monitoramento e Avaliação das parcerias com OSCIPs - CMAP", "Membro": "RICARDO BRITO DOS SANTOS", "Função": "Membro titular"}, {"ID": 167, "Tipo": "Comissão", "Temática": "Parcerias institucionais", "Processo SEI": "04030-00001515/2023-06", "Publicação mais recente": "INSTRUÇÃO Nº 15, DE 03 DE ABRIL DE 2024", "Colegiado": "Comissão de Monitoramento e Avaliação das parcerias com OSCIPs - CMAP", "Membro": "GIOVANNI GRASSI", "Função": "Membro titular"}, {"ID": 168, "Tipo": "Comissão", "Temática": "Parcerias institucionais", "Processo SEI": "00193-00000308/2019-17", "Publicação mais recente": "INSTRUÇÃO Nº 37, DE 11 DE MARÇO DE 2024", "Colegiado": "Comissão Executora da UnDF com a NOVACAP, BIOTIC e FAPDF (Construção Campus na BIOTIC)", "Membro": "RICARDO BRITO DOS SANTOS", "Função": "Membro titular"}, {"ID": 169, "Tipo": "Comissão", "Temática": "Parcerias institucionais", "Processo SEI": "00193-00000308/2019-17", "Publicação mais recente": "INSTRUÇÃO Nº 37, DE 11 DE MARÇO DE 2024", "Colegiado": "Comissão Executora da UnDF com a NOVACAP, BIOTIC e FAPDF (Construção Campus na BIOTIC)", "Membro": "LEANDRO FEITOZA RODRIGUES", "Função": "Membro titular"}, {"ID": 170, "Tipo": "Comissão", "Temática": "Parcerias institucionais", "Processo SEI": "00193-00000308/2019-17", "Publicação mais recente": "INSTRUÇÃO Nº 37, DE 11 DE MARÇO DE 2024", "Colegiado": "Comissão Executora da UnDF com a NOVACAP, BIOTIC e FAPDF (Construção Campus na BIOTIC)", "Membro": "ANA CRISTINA GONÇALVES PENA", "Função": "Membro titular"}, {"ID": 171, "Tipo": "Comissão", "Temática": "Parcerias institucionais", "Processo SEI": "00193-00000308/2019-17", "Publicação mais recente": "INSTRUÇÃO Nº 37, DE 11 DE MARÇO DE 2024", "Colegiado": "Comissão Executora da UnDF com a NOVACAP, BIOTIC e FAPDF (Construção Campus na BIOTIC)", "Membro": "WALDIKE SILVA SOUTO", "Função": "Membro titular"}, {"ID": 172, "Tipo": "Comissão", "Temática": "Parcerias institucionais", "Processo SEI": "00193-00000308/2019-17", "Publicação mais recente": "INSTRUÇÃO Nº 37, DE 11 DE MARÇO DE 2024", "Colegiado": "Comissão Executora da UnDF com a NOVACAP, BIOTIC e FAPDF (Construção Campus na BIOTIC)", "Membro": "MARIA DO CARMO CAMPOS", "Função": "Membro titular"}, {"ID": 173, "Tipo": "Comissão", "Temática": "Parcerias institucionais", "Processo SEI": "00193-00000308/2019-17", "Publicação mais recente": "INSTRUÇÃO Nº 37, DE 11 DE MARÇO DE 2024", "Colegiado": "Comissão Executora da UnDF com a NOVACAP, BIOTIC e FAPDF (Construção Campus na BIOTIC)", "Membro": "CAETANO BARROSO DE OLIVEIRA", "Função": "Membro titular"}, {"ID": 174, "Tipo": "Comissão", "Temática": "Parcerias institucionais", "Processo SEI": "00193-00000308/2019-17", "Publicação mais recente": "INSTRUÇÃO Nº 37, DE 11 DE MARÇO DE 2024", "Colegiado": "Comissão Executora da UnDF com a NOVACAP, BIOTIC e FAPDF (Construção Campus na BIOTIC)", "Membro": "WILLAMY MAMEDE DA SILVA DIAS", "Função": "Membro titular"}, {"ID": 175, "Tipo": "Comissão", "Temática": "Parcerias institucionais", "Processo SEI": "00193-00000308/2019-17", "Publicação mais recente": "INSTRUÇÃO Nº 37, DE 11 DE MARÇO DE 2024", "Colegiado": "Comissão Executora da UnDF com a NOVACAP, BIOTIC e FAPDF (Construção Campus na BIOTIC)", "Membro": "MARCO AURÉLIO SOARES SALGADO", "Função": "Membro titular"}, {"ID": 176, "Tipo": "Comissão", "Temática": "Administrativo", "Processo SEI": "04030-00000869/2022-44", "Publicação mais recente": "PORTARIA Nº 09, DE 21 DE DEZEMBRO DE 2022", "Colegiado": "Comissão de Gestão da Coleta Seletiva Solidária – CGCSS", "Membro": "CLEBER CASIMIRO SILVEIRA", "Função": "Membro titular"}, {"ID": 177, "Tipo": "Comissão", "Temática": "Administrativo", "Processo SEI": "04030-00000869/2022-44", "Publicação mais recente": "PORTARIA Nº 09, DE 21 DE DEZEMBRO DE 2022", "Colegiado": "Comissão de Gestão da Coleta Seletiva Solidária – CGCSS", "Membro": "FAUSTO PFAHL", "Função": "Membro titular"}, {"ID": 178, "Tipo": "Comissão", "Temática": "Administrativo", "Processo SEI": "04030-00000869/2022-44", "Publicação mais recente": "PORTARIA Nº 09, DE 21 DE DEZEMBRO DE 2022", "Colegiado": "Comissão de Gestão da Coleta Seletiva Solidária – CGCSS", "Membro": "LUCIANA DO COUTO NUNES JACOBINA", "Função": "Membro titular"}, {"ID": 179, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001450/2026-33", "Publicação mais recente": "INSTRUÇÃO Nº 23, DE 11 DE JUNHO DE 2026", "Colegiado": "Grupo de Trabalho para implantação do Repositório Institucional da UnDF", "Membro": "Gabriela Freitas de Paiva", "Função": "Membro titular"}, {"ID": 180, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001450/2026-33", "Publicação mais recente": "INSTRUÇÃO Nº 23, DE 11 DE JUNHO DE 2026", "Colegiado": "Grupo de Trabalho para implantação do Repositório Institucional da UnDF", "Membro": "Luiza Martins Santana Araújo", "Função": "Membro titular"}, {"ID": 181, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001450/2026-33", "Publicação mais recente": "INSTRUÇÃO Nº 23, DE 11 DE JUNHO DE 2026", "Colegiado": "Grupo de Trabalho para implantação do Repositório Institucional da UnDF", "Membro": "Ana Cristina de Almeida", "Função": "Membro titular"}, {"ID": 182, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001450/2026-33", "Publicação mais recente": "INSTRUÇÃO Nº 23, DE 11 DE JUNHO DE 2026", "Colegiado": "Grupo de Trabalho para implantação do Repositório Institucional da UnDF", "Membro": "Rosinaldo Barbosa da Silva", "Função": "Membro titular"}, {"ID": 183, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001450/2026-33", "Publicação mais recente": "INSTRUÇÃO Nº 23, DE 11 DE JUNHO DE 2026", "Colegiado": "Grupo de Trabalho para implantação do Repositório Institucional da UnDF", "Membro": "Juliano Sposito Galdino", "Função": "Membro titular"}, {"ID": 184, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001450/2026-33", "Publicação mais recente": "INSTRUÇÃO Nº 23, DE 11 DE JUNHO DE 2026", "Colegiado": "Grupo de Trabalho para implantação do Repositório Institucional da UnDF", "Membro": "Giovanni Grassi", "Função": "Membro titular"}, {"ID": 185, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001450/2026-33", "Publicação mais recente": "INSTRUÇÃO Nº 23, DE 11 DE JUNHO DE 2026", "Colegiado": "Grupo de Trabalho para implantação do Repositório Institucional da UnDF", "Membro": "Frank Nely Peres Alves", "Função": "Membro titular"}, {"ID": 186, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001450/2026-33", "Publicação mais recente": "INSTRUÇÃO Nº 23, DE 11 DE JUNHO DE 2026", "Colegiado": "Grupo de Trabalho para implantação do Repositório Institucional da UnDF", "Membro": "Taise Alves Borges Silva", "Função": "Membro titular"}, {"ID": 187, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001660/2025-41", "Publicação mais recente": "INSTRUÇÃO Nº 47, DE 1º DE SETEMBRO DE 2025", "Colegiado": "Grupo de Trabalho do Recredenciamento da Universidade", "Membro": "Alessandra Edver Mello dos Santos", "Função": "Membro titular"}, {"ID": 188, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001660/2025-41", "Publicação mais recente": "INSTRUÇÃO Nº 47, DE 1º DE SETEMBRO DE 2025", "Colegiado": "Grupo de Trabalho do Recredenciamento da Universidade", "Membro": "Caroline Nunes Silva", "Função": "Coordenadora"}, {"ID": 189, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001660/2025-41", "Publicação mais recente": "INSTRUÇÃO Nº 47, DE 1º DE SETEMBRO DE 2025", "Colegiado": "Grupo de Trabalho do Recredenciamento da Universidade", "Membro": "Juliano Sposito Galdino", "Função": "Membro titular"}, {"ID": 190, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001660/2025-41", "Publicação mais recente": "INSTRUÇÃO Nº 47, DE 1º DE SETEMBRO DE 2025", "Colegiado": "Grupo de Trabalho do Recredenciamento da Universidade", "Membro": "Giovanni Grassi", "Função": "Membro titular"}, {"ID": 191, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001660/2025-41", "Publicação mais recente": "INSTRUÇÃO Nº 47, DE 1º DE SETEMBRO DE 2025", "Colegiado": "Grupo de Trabalho do Recredenciamento da Universidade", "Membro": "Maria da Cruz Lobo Portela", "Função": "Membro titular"}, {"ID": 192, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001660/2025-41", "Publicação mais recente": "INSTRUÇÃO Nº 47, DE 1º DE SETEMBRO DE 2025", "Colegiado": "Grupo de Trabalho do Recredenciamento da Universidade", "Membro": "Fernanda Augusta Santos Escossia de Oliveira", "Função": "Membro titular"}, {"ID": 193, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001660/2025-41", "Publicação mais recente": "INSTRUÇÃO Nº 47, DE 1º DE SETEMBRO DE 2025", "Colegiado": "Grupo de Trabalho do Recredenciamento da Universidade", "Membro": "Rosângela Lopez Cruzeiro Peixoto", "Função": "Membro titular"}, {"ID": 194, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001660/2025-41", "Publicação mais recente": "INSTRUÇÃO Nº 47, DE 1º DE SETEMBRO DE 2025", "Colegiado": "Grupo de Trabalho do Recredenciamento da Universidade", "Membro": "Richard James Lopes de Abreu", "Função": "Membro titular"}, {"ID": 195, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001660/2025-41", "Publicação mais recente": "INSTRUÇÃO Nº 47, DE 1º DE SETEMBRO DE 2025", "Colegiado": "Grupo de Trabalho do Recredenciamento da Universidade", "Membro": "Elaine dos Santos Jacob", "Função": "Membro titular"}, {"ID": 196, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001660/2025-41", "Publicação mais recente": "INSTRUÇÃO Nº 47, DE 1º DE SETEMBRO DE 2025", "Colegiado": "Grupo de Trabalho do Recredenciamento da Universidade", "Membro": "Flávio Mascarenhas Roriz Pedrosa", "Função": "Membro titular"}, {"ID": 197, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001660/2025-41", "Publicação mais recente": "INSTRUÇÃO Nº 47, DE 1º DE SETEMBRO DE 2025", "Colegiado": "Grupo de Trabalho do Recredenciamento da Universidade", "Membro": "Marjorie Gonçalves Andersen Trindade", "Função": "Membro titular"}, {"ID": 198, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001660/2025-41", "Publicação mais recente": "INSTRUÇÃO Nº 47, DE 1º DE SETEMBRO DE 2025", "Colegiado": "Grupo de Trabalho do Recredenciamento da Universidade", "Membro": "Enam Lima Pires,", "Função": "Membro titular"}, {"ID": 199, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001660/2025-41", "Publicação mais recente": "INSTRUÇÃO Nº 47, DE 1º DE SETEMBRO DE 2025", "Colegiado": "Grupo de Trabalho do Recredenciamento da Universidade", "Membro": "Walace Roza Abreu,", "Função": "Membro titular"}, {"ID": 200, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001660/2025-41", "Publicação mais recente": "INSTRUÇÃO Nº 47, DE 1º DE SETEMBRO DE 2025", "Colegiado": "Grupo de Trabalho do Recredenciamento da Universidade", "Membro": "Givael Lima da Silva", "Função": "Membro titular"}, {"ID": 201, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001660/2025-41", "Publicação mais recente": "INSTRUÇÃO Nº 47, DE 1º DE SETEMBRO DE 2025", "Colegiado": "Grupo de Trabalho do Recredenciamento da Universidade", "Membro": "Anderson Ferreira da Silva", "Função": "Membro titular"}, {"ID": 202, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001660/2025-41", "Publicação mais recente": "INSTRUÇÃO Nº 47, DE 1º DE SETEMBRO DE 2025", "Colegiado": "Grupo de Trabalho do Recredenciamento da Universidade", "Membro": "Danubia da Costa Teixeira", "Função": "Membro titular"}, {"ID": 203, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001660/2025-41", "Publicação mais recente": "INSTRUÇÃO Nº 47, DE 1º DE SETEMBRO DE 2025", "Colegiado": "Grupo de Trabalho do Recredenciamento da Universidade", "Membro": "Sula Salani Mota", "Função": "Membro titular"}, {"ID": 204, "Tipo": "Grupo de Trabalho", "Temática": "Acadêmico", "Processo SEI": "04030-00001660/2025-41", "Publicação mais recente": "INSTRUÇÃO Nº 47, DE 1º DE SETEMBRO DE 2025", "Colegiado": "Grupo de Trabalho do Recredenciamento da Universidade", "Membro": "Douglas Leite Piasson", "Função": "Membro titular"}];
+
+    const campos = ["Membro", "Colegiado", "Temática", "Tipo"];
+    const $ = id => document.getElementById(id);
+
+    function norm(s) {
+      return (s || "").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function unique(arr) {
+      return [...new Set(arr.filter(v => v !== null && v !== undefined && String(v).trim() !== "").map(v => String(v).trim()))].sort((a,b)=>a.localeCompare(b, 'pt-BR'));
+    }
+
+    function popularSelect(id, valores) {
+      const sel = $(id);
+      const atual = sel.value;
+      sel.innerHTML = '<option value="">'+(id === 'tematica' ? 'Todas' : 'Todos')+'</option>';
+      valores.forEach(v => {
+        const opt = document.createElement("option");
+        opt.value = v;
+        opt.textContent = v;
+        sel.appendChild(opt);
+      });
+      if (valores.includes(atual)) sel.value = atual;
+    }
+
+    function init() {
+      popularSelect("membro", unique(dados.map(d => d.Membro)));
+      popularSelect("colegiado", unique(dados.map(d => d.Colegiado)));
+      popularSelect("tematica", unique(dados.map(d => d.Temática)));
+      popularSelect("tipo", unique(dados.map(d => d.Tipo)));
+
+      ["q", "membro", "colegiado", "tematica", "tipo"].forEach(id => {
+        $(id).addEventListener("input", render);
+        $(id).addEventListener("change", render);
+      });
+      render();
+    }
+
+    function filtrar() {
+      const q = norm($("q").value);
+      const membro = norm($("membro").value);
+      const colegiado = norm($("colegiado").value);
+      const tematica = norm($("tematica").value);
+      const tipo = norm($("tipo").value);
+
+      return dados.filter(d => {
+        const texto = norm(Object.values(d).join(" "));
+        return (!q || texto.includes(q))
+          && (!membro || norm(d.Membro) === membro)
+          && (!colegiado || norm(d.Colegiado) === colegiado)
+          && (!tematica || norm(d.Temática) === tematica)
+          && (!tipo || norm(d.Tipo) === tipo);
+      });
+    }
+
+    function renderKpis(rows) {
+      $("kpiColegiados").textContent = unique(dados.map(d => d.Colegiado)).length;
+      $("kpiMembros").textContent = unique(dados.map(d => d.Membro)).length;
+      $("kpiParticipacoes").textContent = dados.length;
+      $("kpiTematicas").textContent = unique(dados.map(d => d.Temática)).length;
+    }
+
+    function renderTabela(rows) {
+      const tbody = $("tbody");
+      tbody.innerHTML = "";
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum registro encontrado.</td></tr>';
+        $("countRows").textContent = "0 registros";
+        return;
+      }
+      const frag = document.createDocumentFragment();
+      rows.forEach(d => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${escapeHtml(d.Membro)}</td>
+          <td>${escapeHtml(d.Colegiado)}<br><span class="pill">${escapeHtml(d.Tipo)}</span></td>
+          <td>${escapeHtml(d.Função)}</td>
+          <td>${escapeHtml(d.Temática)}</td>
+          <td>${escapeHtml(d["Processo SEI"])}</td>
+          <td>${escapeHtml(d["Publicação mais recente"])}</td>`;
+        frag.appendChild(tr);
+      });
+      tbody.appendChild(frag);
+      $("countRows").textContent = rows.length + (rows.length === 1 ? " registro" : " registros");
+    }
+
+    function contarPor(rows, campo) {
+      const map = new Map();
+      rows.forEach(d => {
+        const v = (d[campo] || "").trim();
+        if (!v) return;
+        map.set(v, (map.get(v)||0)+1);
+      });
+      return [...map.entries()].sort((a,b)=> b[1]-a[1] || a[0].localeCompare(b[0], 'pt-BR'));
+    }
+
+    function renderRanking(rows) {
+      const div = $("ranking");
+      const ranking = contarPor(rows, "Membro").slice(0, 15);
+      div.innerHTML = ranking.map(([nome, qtd]) => `
+        <div class="rank-item">
+          <span class="rank-name">${escapeHtml(nome)}</span>
+          <span class="rank-count">${qtd}</span>
+        </div>
+      `).join("") || '<div class="empty">Sem dados.</div>';
+    }
+
+    function renderResumo(rows) {
+      const resumo = contarPor(rows, "Tipo");
+      $("resumoTipo").innerHTML = resumo.map(([tipo, qtd]) => `
+        <div class="rank-item"><span>${escapeHtml(tipo)}</span><span class="rank-count">${qtd}</span></div>
+      `).join("") || '<div class="empty">Sem dados.</div>';
+
+      const cols = unique(rows.map(d => d.Colegiado));
+      $("countColegiadosFiltro").textContent = cols.length;
+      $("chipsColegiados").innerHTML = cols.map(c => `<span class="pill">${escapeHtml(c)}</span>`).join("") || '<div class="empty">Sem colegiados.</div>';
+    }
+
+    function render() {
+      const rows = filtrar();
+      renderKpis(rows);
+      renderTabela(rows);
+      renderRanking(rows);
+      renderResumo(rows);
+    }
+
+    function limparFiltros() {
+      ["q", "membro", "colegiado", "tematica", "tipo"].forEach(id => $(id).value = "");
+      render();
+    }
+
+    function escapeHtml(s) {
+      return String(s ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    init();
+  </script>
+</body>
+</html>

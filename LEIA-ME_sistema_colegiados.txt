@@ -1,0 +1,20 @@
+SISTEMA DE COLEGIADOS DA UNDF
+
+Arquivos:
+1. sistema_colegiados_undf.html
+   - Aplicação web estática.
+   - Abra no navegador.
+   - Pode ser compartilhada por e-mail, Google Drive, Teams, OneDrive ou publicada em uma página interna.
+   - Os dados estão embutidos no arquivo HTML. Para atualizar, gere uma nova versão a partir da planilha atualizada.
+
+2. base_colegiados_undf.csv
+   - Base tratada usada pelo sistema.
+   - Pode ser utilizada em Power BI, Looker Studio, Excel ou AppSheet.
+
+Como usar:
+- Abra o arquivo sistema_colegiados_undf.html.
+- Use a pesquisa geral ou os filtros de Membro, Colegiado, Temática e Tipo.
+- O ranking e os resumos mudam conforme os filtros aplicados.
+
+Observação:
+Esta é uma versão estática. Para edição colaborativa em tempo real e login de usuários, o caminho mais adequado é AppSheet, Power Apps ou uma aplicação hospedada.
